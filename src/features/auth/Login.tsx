@@ -3,7 +3,7 @@ import { useFormik } from "formik";
 import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 import { Button, Checkbox, FormControl, FormControlLabel, FormGroup, FormLabel, Grid, TextField } from "@mui/material";
-import { loginTC } from "features/auth/auth.reducer";
+import { authThunks } from "features/auth/auth.reducer";
 import { useAppDispatch } from "common/hooks";
 import { selectIsLoggedIn } from "features/auth/auth.selectors";
 
@@ -16,27 +16,32 @@ export const Login = () => {
     validate: (values) => {
       if (!values.email) {
         return {
-          email: "Email is required",
+          email: "Email is required"
         };
       }
       if (!values.password) {
         return {
-          password: "Password is required",
+          password: "Password is required"
         };
       }
     },
     initialValues: {
       email: "",
       password: "",
-      rememberMe: false,
+      rememberMe: false
     },
     onSubmit: (values) => {
-      dispatch(loginTC(values));
-    },
+      dispatch(authThunks.login(values))
+        .unwrap()
+        .then((res) => {
+        })
+        .catch((message) => {
+        });
+    }
   });
 
   if (isLoggedIn) {
-    return <Navigate to={"/"} />;
+    return <Navigate to={"/TodolistsList"} />;
   }
 
   return (
