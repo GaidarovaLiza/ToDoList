@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import {
@@ -9,32 +9,29 @@ import {
   IconButton,
   LinearProgress,
   Toolbar,
-  Typography
+  Typography,
 } from "@mui/material";
 import { Menu } from "@mui/icons-material";
-import { Login } from "features/auth/Login";
-import { authThunks } from "features/auth/auth.reducer";
-import "./App.css";
-import { TodolistsList } from "features/TodolistsList/TodolistsList";
+import { Login } from "features/auth/ui/login/login";
+import { TodolistsList } from "features/TodolistsList/ui/TodolistsList";
 import { ErrorSnackbar } from "common/components";
-import { useAppDispatch } from "common/hooks";
-import { selectIsLoggedIn } from "features/auth/auth.selectors";
+import { useActions } from "common/hooks";
+import { selectIsLoggedIn } from "features/auth/model/auth.selectors";
 import { selectAppStatus, selectIsInitialized } from "app/app.selectors";
+import { authThunks } from "features/auth/model/auth.slice";
 
 function App() {
   const status = useSelector(selectAppStatus);
   const isInitialized = useSelector(selectIsInitialized);
   const isLoggedIn = useSelector(selectIsLoggedIn);
 
-  const dispatch = useAppDispatch();
+  const { initializeApp, logout } = useActions(authThunks);
 
   useEffect(() => {
-    dispatch(authThunks.initializeApp());
+    initializeApp();
   }, []);
 
-  const logoutHandler = useCallback(() => {
-    dispatch(authThunks.logout());
-  }, []);
+  const logoutHandler = () => logout();
 
   if (!isInitialized) {
     return (
@@ -43,7 +40,6 @@ function App() {
       </div>
     );
   }
-  //commit to check
 
   return (
     <BrowserRouter>
@@ -61,11 +57,11 @@ function App() {
               </Button>
             )}
           </Toolbar>
-          {status === "loading" && <LinearProgress />}
+          {status === "loading" && <LinearProgress color={"error"} />}
         </AppBar>
         <Container fixed>
           <Routes>
-            <Route path={"/TodolistsList"} element={<TodolistsList />} />
+            <Route path={"/"} element={<TodolistsList />} />
             <Route path={"/login"} element={<Login />} />
           </Routes>
         </Container>
